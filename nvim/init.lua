@@ -1,5 +1,9 @@
 local border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
 
+-- disable netrw at the very start of your init.lua
+vim.g.loaded_netrw = 1
+vim.g.loaded_netrwPlugin = 1
+
 -- Space
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -8,7 +12,7 @@ vim.g.maplocalleader = " "
 vim.opt.number = true
 
 -- Mouse
-vim.opt.mouse = ""
+vim.opt.mouse = "a"
 
 -- 2 tabs or heuristic
 vim.opt.smarttab = true
@@ -125,11 +129,12 @@ vim.keymap.set("n", "<Esc>", "<cmd>nohlsearch<CR>")
 vim.keymap.set("n", "<leader>w", "<cmd>w<CR>")
 
 --  Split navigation
-vim.keymap.set("n", "<C-h>", "<C-w><C-h>", { desc = "Move focus to the left window" })
-vim.keymap.set("n", "<C-l>", "<C-w><C-l>", { desc = "Move focus to the right window" })
-vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
-vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
-
+vim.keymap.set("n", "<C-h>", "<C-PageUp>", { desc = "Move focus to the left window" })
+vim.keymap.set("n", "<C-l>", "<C-PageDown>", { desc = "Move focus to the right window" })
+-- vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
+-- vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+vim.keymap.set("n", "<C-c>", ":tabnew<CR>", { desc = "New tab" })
+vim.keymap.set("n", "<C-j>", ":NvimTreeToggle<CR>", { desc = "Toggles nvim tree" })
 -------------
 -- Plugins --
 -------------
@@ -144,6 +149,17 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Lazy plugin list
 require("lazy").setup({
+  {
+    "nvim-tree/nvim-tree.lua",
+    version = "*",
+    lazy = false,
+    dependencies = {
+      "nvim-tree/nvim-web-devicons",
+    },
+    config = function()
+      require("nvim-tree").setup {}
+    end,
+  },
   {
     "ray-x/lsp_signature.nvim",
     event = "VeryLazy",
@@ -169,7 +185,7 @@ require("lazy").setup({
   end
   },
   {
-  "kdheepak/lazygit.nvim",
+    "kdheepak/lazygit.nvim",
     cmd = {
       "LazyGit",
       "LazyGitConfig",
@@ -177,23 +193,15 @@ require("lazy").setup({
       "LazyGitFilter",
       "LazyGitFilterCurrentFile",
     },
-    -- optional for floating window border decoration
-    dependencies = {
-        "nvim-lua/plenary.nvim",
-    },
-    -- setting the keybinding for LazyGit with 'keys' is recommended in
-    -- order to load the plugin when the command is run for the first time
-    keys = {
-       { "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
-    }
-  },
-  {
-      'AlexvZyl/nordic.nvim',
-      lazy = false,
-      priority = 1000,
-      config = function()
-          require 'nordic' .load()
-      end
+      -- optional for floating window border decoration
+      dependencies = {
+          "nvim-lua/plenary.nvim",
+      },
+      -- setting the keybinding for LazyGit with 'keys' is recommended in
+      -- order to load the plugin when the command is run for the first time
+      keys = {
+         { "<leader>gg", "<cmd>LazyGit<cr>", desc = "LazyGit" }
+      }
   },
 	{
 		-- Heuristicaly detect tabstop/shiftwidth from file
@@ -201,11 +209,10 @@ require("lazy").setup({
 	},
   {
     "lewis6991/gitsigns.nvim",
-    opts = function()
-      return {
-        current_line_blame = true
-      }
-    end
+    opts = {
+      signcolumn = true,
+      current_line_blame = true
+    }
   },
 	{
 		-- nvim statusline
@@ -215,16 +222,16 @@ require("lazy").setup({
 				options = {
 					icons_enabled = false,
 					style = "default",
-					theme = "16color",
+					theme = "material",
 					section_separators = "",
-					component_separators = "",
-					sections = {
+					component_separators = "|"
+        },
+        sections = {
 						lualine_a = { "mode" },
 						lualine_b = { "branch", "diff", "diagnostics" },
-						lualine_c = { "filename" },
+						lualine_c = {{ "filename", file_status = true, path = 3 }},
 						lualine_x = { "encoding", "filetype" },
 						lualine_z = { "location" },
-					},
 				},
 			}
 		end,
@@ -288,7 +295,7 @@ require("lazy").setup({
 	},
 
 	-- {
-	-- 	-- Base c]olorscheme
+	-- 	-- Base colorscheme
 	-- 	"Mofiqul/vscode.nvim",
 	-- 	-- Load this before any other plugin
 	-- 	priority = 1000,
@@ -296,7 +303,14 @@ require("lazy").setup({
 	-- 		vim.cmd.colorscheme("vscode")
 	-- 	end,
 	-- },
-
+  {
+      'AlexvZyl/nordic.nvim',
+      lazy = false,
+      priority = 1000,
+      config = function()
+          require 'nordic' .load()
+      end
+  },
 	{
 		-- Fuzzy Finder
 		"nvim-telescope/telescope.nvim",
@@ -335,6 +349,7 @@ require("lazy").setup({
 							["q"] = actions.close,
 						},
 					},
+          winblend = 30
 				},
 				-- pickers = {}
 				extensions = {
@@ -347,6 +362,16 @@ require("lazy").setup({
 			-- Enable Telescope extensions if they are installed
 			pcall(require("telescope").load_extension, "fzf")
 			pcall(require("telescope").load_extension, "ui-select")
+
+      -- Telescope rewrite path display
+      require('telescope').setup {
+        defaults = {
+            path_display = function(_, path)
+                local tail = require("telescope.utils").path_tail(path)
+                return string.format("%s (%s)", tail, path)
+            end,
+        },
+      }
 
 			-- Telescope triggering mappings (move outside)
 			local builtin = require("telescope.builtin")
@@ -612,7 +637,7 @@ require("lazy").setup({
 					completion = {
 						scrolloff = 1,
 						completeopt = "menu,menuone,noinsert",
-						side_padding = 0,
+            side_padding = 0,
 						border = "rounded",
 						scrollbar = false,
 						max_width = 10,
