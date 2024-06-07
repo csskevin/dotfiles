@@ -1,4 +1,4 @@
-local border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }
+
 
 -- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
@@ -135,6 +135,10 @@ vim.keymap.set("n", "<C-l>", "<C-PageDown>", { desc = "Move focus to the right w
 -- vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
 vim.keymap.set("n", "<C-c>", ":tabnew<CR>", { desc = "New tab" })
 vim.keymap.set("n", "<C-j>", ":NvimTreeToggle<CR>", { desc = "Toggles nvim tree" })
+
+vim.keymap.set('n', '<leader>S', '<cmd>lua require("spectre").toggle()<CR>', {
+    desc = "Toggle Spectre"
+})
 -------------
 -- Plugins --
 -------------
@@ -149,6 +153,12 @@ vim.opt.rtp:prepend(lazypath)
 
 -- Lazy plugin list
 require("lazy").setup({
+  {
+    "jose-elias-alvarez/null-ls.nvim"
+  },
+  {
+    "nvim-pack/nvim-spectre"
+  },
   {
     "nvim-tree/nvim-tree.lua",
     version = "*",
@@ -211,7 +221,51 @@ require("lazy").setup({
     "lewis6991/gitsigns.nvim",
     opts = {
       signcolumn = true,
-      current_line_blame = true
+      current_line_blame = true,
+      on_attach = function(bufnr)
+          local gitsigns = require('gitsigns')
+
+          local function map(mode, l, r, opts)
+            opts = opts or {}
+            opts.buffer = bufnr
+            vim.keymap.set(mode, l, r, opts)
+          end
+
+          -- Navigation
+          map('n', ']c', function()
+            if vim.wo.diff then
+              vim.cmd.normal({']c', bang = true})
+            else
+              gitsigns.nav_hunk('next')
+            end
+          end)
+
+          map('n', '[c', function()
+            if vim.wo.diff then
+              vim.cmd.normal({'[c', bang = true})
+            else
+              gitsigns.nav_hunk('prev')
+            end
+          end)
+
+          -- Actions
+          map('n', '<leader>hs', gitsigns.stage_hunk, { desc = "Stage Hunk" })
+          map('n', '<leader>hr', gitsigns.reset_hunk, { desc= "Reset Hunk" })
+          map('v', '<leader>hs', function() gitsigns.stage_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
+          map('v', '<leader>hr', function() gitsigns.reset_hunk {vim.fn.line('.'), vim.fn.line('v')} end)
+          map('n', '<leader>hS', gitsigns.stage_buffer, { desc = "Stage Buffer" })
+          map('n', '<leader>hu', gitsigns.undo_stage_hunk, { desc = "Undo Stage Hunk" })
+          map('n', '<leader>hR', gitsigns.reset_buffer, { desc = "Reset Buffer" })
+          map('n', '<leader>hp', gitsigns.preview_hunk, { desc = "Preview Hunk" })
+          map('n', '<leader>hb', function() gitsigns.blame_line{full=true} end, { desc = "Full Line Blame" })
+          map('n', '<leader>tb', gitsigns.toggle_current_line_blame, { desc = "Toggle Blame Line" })
+          map('n', '<leader>hd', gitsigns.diffthis, { desc = "Diff This" })
+          map('n', '<leader>hD', function() gitsigns.diffthis('~') end, { desc = "Diff This ~"})
+          map('n', '<leader>td', gitsigns.toggle_deleted, { desc = "Toggle Deleted"})
+
+          -- Text object
+          map({'o', 'x'}, 'ih', ':<C-U>Gitsigns select_hunk<CR>')
+        end
     }
   },
 	{
@@ -264,6 +318,7 @@ require("lazy").setup({
 				["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
 				["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
 				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
+        ["<leader>h"] = { name = "[H]unks (Git)", _ = "which_key_ignore"}
 			})
 		end,
 	},
@@ -408,8 +463,8 @@ require("lazy").setup({
 			vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, { border = nil })
 			vim.lsp.handlers["textDocument/publishDiagnostics"] =
 				vim.lsp.with(vim.lsp.diagnostic.on_publish_diagnostics, {
-					virtual_text = false,
-					underline = false,
+					virtual_text = true,
+					underline = true,
 				})
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("kickstart-lsp-attach", { clear = true }),
@@ -500,6 +555,11 @@ require("lazy").setup({
 				-- tsserver = {},
 				--
 
+        typst_lsp = {
+          settings = {
+            exportPdf = "never"
+          }
+        },
 				lua_ls = {
 					-- cmd = {...},
 					-- filetypes = { ...},
