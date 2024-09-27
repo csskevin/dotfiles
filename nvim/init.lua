@@ -151,8 +151,27 @@ if not vim.loop.fs_stat(lazypath) then
 end ---@diagnostic disable-next-line: undefined-field
 vim.opt.rtp:prepend(lazypath)
 
+
 -- Lazy plugin list
 require("lazy").setup({
+  {
+    'chomosuke/typst-preview.nvim',
+    lazy = false, -- or ft = 'typst'
+    version = '0.3.*',
+    build = function() require 'typst-preview'.update() end,
+    opts = {
+      follow_cursor = true
+    }
+  },
+  {
+    "folke/todo-comments.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    opts = {
+      -- your configuration comes here
+      -- or leave it empty to use the default settings
+      -- refer to the configuration section below
+    }
+  },
   {
     "jose-elias-alvarez/null-ls.nvim"
   },
@@ -179,19 +198,23 @@ require("lazy").setup({
   {
   "karb94/neoscroll.nvim",
   config = function ()
-    require('neoscroll').setup {}
 
-    local t = {}
-    t['<C-u>'] = {'scroll', {'-vim.wo.scroll', 'true', '10'}}
-    t['<C-d>'] = {'scroll', { 'vim.wo.scroll', 'true', '10'}}
-    t['<C-b>'] = {'scroll', {'-vim.api.nvim_win_get_height(0)', 'true', '50'}}
-    t['<C-f>'] = {'scroll', { 'vim.api.nvim_win_get_height(0)', 'true', '50'}}
-    t['<C-y>'] = {'scroll', {'-0.10', 'false', '10'}}
-    t['<C-e>'] = {'scroll', { '0.10', 'false', '10'}}
-    t['zt']    = {'zt', {'50'}}
-    t['zz']    = {'zz', {'50'}}
-    t['zb']    = {'zb', {'50'}}
-    require('neoscroll.config').set_mappings(t)
+    neoscroll = require('neoscroll')
+    local keymap = {
+      ["<C-u>"] = function() neoscroll.ctrl_u({ duration = 10}) end;
+      ["<C-d>"] = function() neoscroll.ctrl_d({ duration = 10 }) end;
+      ["<C-b>"] = function() neoscroll.ctrl_b({ duration = 50 }) end;
+      ["<C-f>"] = function() neoscroll.ctrl_f({ duration = 50 }) end;
+      ["<C-y>"] = function() neoscroll.scroll(-0.1, { move_cursor=false; duration = 10 }) end;
+      ["<C-e>"] = function() neoscroll.scroll(0.1, { move_cursor=false; duration = 10 }) end;
+      ["zt"]    = function() neoscroll.zt({ half_win_duration = 50 }) end;
+      ["zz"]    = function() neoscroll.zz({ half_win_duration = 50 }) end;
+      ["zb"]    = function() neoscroll.zb({ half_win_duration = 50 }) end;
+    }
+    local modes = { 'n', 'v', 'x' }
+    for key, func in pairs(keymap) do
+      vim.keymap.set(modes, key, func)
+    end
   end
   },
   {
@@ -302,27 +325,23 @@ require("lazy").setup({
 		"windwp/nvim-autopairs",
 		event = "InsertEnter",
 		config = true,
-	},
-
-	{
-		-- Show keybinds
-		"folke/which-key.nvim",
-		event = "VimEnter",
-		config = function()
-			require("which-key").setup()
-
-			-- Document existing key chains
-			require("which-key").register({
-				["<leader>c"] = { name = "[C]ode", _ = "which_key_ignore" },
-				["<leader>d"] = { name = "[D]ocument", _ = "which_key_ignore" },
-				["<leader>r"] = { name = "[R]ename", _ = "which_key_ignore" },
-				["<leader>s"] = { name = "[S]earch", _ = "which_key_ignore" },
-				["<leader>w"] = { name = "[W]orkspace", _ = "which_key_ignore" },
-        ["<leader>h"] = { name = "[H]unks (Git)", _ = "which_key_ignore"}
-			})
-		end,
-	},
-
+	},  
+  { -- Useful plugin to show you pending keybinds.
+    'folke/which-key.nvim',
+    event = 'VimEnter', -- Sets the loading event to 'VimEnter'
+    opts = {
+      -- Document existing key chains
+      spec = {
+        { '<leader>c', group = '[C]ode', mode = { 'n', 'x' } },
+        { '<leader>d', group = '[D]ocument' },
+        { '<leader>r', group = '[R]ename' },
+        { '<leader>s', group = '[S]earch' },
+        { '<leader>w', group = '[W]orkspace' },
+        { '<leader>t', group = '[T]oggle' },
+        { '<leader>h', group = 'Git [H]unk', mode = { 'n', 'v' } },
+      },
+    },
+  },
 	{
 		-- Indentation guides
 		"lukas-reineke/indent-blankline.nvim",
@@ -358,14 +377,14 @@ require("lazy").setup({
 	-- 		vim.cmd.colorscheme("vscode")
 	-- 	end,
 	-- },
-  {
-      'AlexvZyl/nordic.nvim',
-      lazy = false,
-      priority = 1000,
-      config = function()
-          require 'nordic' .load()
-      end
-  },
+  -- {
+  --     'AlexvZyl/nordic.nvim',
+  --     lazy = false,
+  --     priority = 1000,
+  --     config = function()
+  --         require 'nordic' .load()
+  --     end
+  -- },
 	{
 		-- Fuzzy Finder
 		"nvim-telescope/telescope.nvim",
