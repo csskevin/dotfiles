@@ -4,117 +4,61 @@
 #
 # Read `man 5 sway` for a complete reference.
 
+### Startup
+exec {
+    way-displays
+    nm-applet
+    blueman-applet
+    swaync 
+    kwalletd6
+    swayidle -w \
+             timeout 300 '$HOME/.config/.scripts/lock.sh' \
+             timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
+             before-sleep '$HOME/.config/.scripts/lock.sh'
+    ~/.config/.scripts/waybar.sh
+    /usr/lib/mate-polkit/polkit-mate-authentication-agent-1 
+    ~/Pictures/backgrounds/changer.sh
+}
+
+exec_always {
+    /usr/bin/foot --server
+    systemctl --user import-environment
+    # gsettings set org.gnome.desktop.interface gtk-theme 'Adwaita-dark'
+    # gsettings set org.gnome.desktop.interface icon-theme 'Adwaita'
+    # gsettings set org.gnome.desktop.interface cursor-theme 'Adwaita'
+    # gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'
+    swaync --style /etc/sway/swaync/style.css --config /etc/sway/swaync/config.json
+    # swww-daemon
+}
+
 ### Variables
 #
 # Logo key. Use Mod1 for Alt.
 set $mod Mod4
+set $alt Mod1
 # Home row direction keys, like vim
 set $left h
 set $down j
 set $up k
 set $right l
-# Your preferred terminal emulator
-set $term foot
-# Your preferred application launcher
-# Note: pass the final command to swaymsg so that the resulting window can be opened
-# on the original workspace that the command was run on.
-#set $menu dmenu_path | dmenu | xargs swaymsg exec --
-set $menu $HOME/.config/.scripts/launcher.sh
 
-### Output configuration
-#
-# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg $HOME/.config/sway/background.png fill
-#
-# Example configuration:
-#
-#   output HDMI-A-1 resolution 1920x1080 position 1920,0
-#
-# You can get the names of your outputs by running: swaymsg -t get_outputs
-
-### Idle configuration
-#
-# Example configuration:
-#
-exec swayidle -w \
-         timeout 300 '$HOME/.config/.scripts/swaylock.sh' \
-         timeout 600 'swaymsg "output * power off"' resume 'swaymsg "output * power on"' \
-         before-sleep '$HOME/.config/.scripts/swaylock.sh'
-
-exec swaync
-exec way-displays
-exec nm-applet
-
-#
-# This will lock your screen after 300 seconds of inactivity, then turn off
-# your displays after another 300 seconds, and turn your screens back on when
-# resumed. It will also lock your screen before your computer goes to sleep.
 
 ### Input configuration
-#
-# Example configuration:
-#
-#   input "2:14:SynPS/2_Synaptics_TouchPad" {
-#       dwt enabled
-#       tap enabled
-#       natural_scroll enabled
-#       middle_emulation enabled
-#   }
-#
 
-# You can get the names of your inputs by running: swaymsg -t get_inputs
-# Read `man 5 sway-input` for more information about this section.
+input "type:touchpad" {
+    dwt disabled
+    tap enabled
+    natural_scroll disabled
+    middle_emulation enabled
+}
+
+
+input type:keyboard xkb_layout eu,de
+input type:keyboard xkb_options caps:escape
+
+bindsym $mod+Ctrl+Shift+Return exec swaymsg input type:keyboard xkb_switch_layout next
 
 ### Key bindings
-#
-# Basics:
-#
-
-    # CUSTOM 
-    bindsym $mod+XF86AudioPlay exec $HOME/.config/.scripts/pipewire-toggle-sink.sh
-    bindsym XF86AudioMute exec $HOME/.config/.scripts/pipewire-mute.sh
-    bindsym XF86AudioRaiseVolume exec $HOME/.config/.scripts/pipewire-volume-raise.sh
-    bindsym XF86AudioLowerVolume exec $HOME/.config/.scripts/pipewire-volume-lower.sh
-    bindsym XF86AudioPrev exec $HOME/.config/.scripts/playerctl-prev.sh
-    bindsym XF86AudioPlay exec $HOME/.config/.scripts/playerctl-play-pause.sh
-    bindsym XF86AudioNext exec $HOME/.config/.scripts/playerctl-next.sh
-    bindsym XF86MonBrightnessUp exec $HOME/.config/.scripts/brightness-raise.sh
-    bindsym XF86MonBrightnessDown exec $HOME/.config/.scripts/brightness-lower.sh
-    bindsym F3 exec $HOME/.config/.scripts/screenshot.sh
-
-    bindsym $mod+b exec firefox
-    bindsym $mod+c exec mate-calc
-    bindsym $mod+Ctrl+l exec $HOME/.config/.scripts/swaylock.sh
-
-    # Start a terminal
-    bindsym $mod+Return exec $term
-
-    # Kill focused window
-    bindsym $mod+q kill
-
-    # Start your launcher
-    bindsym $mod+Space exec $menu
-
-    default_border pixel 0
-    gaps inner 1
-    client.focused #6da741 #173f4f #73ba25
-    client.unfocused #00a489 #173f4f #35b9ab
-    client.focused_inactive #6da741 #00a489 #173f4f
-
-    # CUSTOM END
-
-    # Drag floating windows by holding down $mod and left mouse button.
-    # Resize them with right mouse button + $mod.
-    # Despite the name, also works for non-floating windows.
-    # Change normal to inverse to use left mouse button for resizing and right
-    # mouse button for dragging.
-    floating_modifier $mod normal
-
-    # Reload the configuration file
-    bindsym $mod+Shift+r reload
-
-    # Exit sway (logs you out of your Wayland session)
-    bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 #
 # Moving around:
 #
@@ -139,6 +83,8 @@ exec nm-applet
     bindsym $mod+Shift+Down move down
     bindsym $mod+Shift+Up move up
     bindsym $mod+Shift+Right move right
+
+    floating_modifier $mod normal
 #
 # Workspaces:
 #
@@ -153,7 +99,7 @@ exec nm-applet
     bindsym $mod+8 workspace number 8
     bindsym $mod+9 workspace number 9
     bindsym $mod+0 workspace number 10
-    # Move focused container to workspace
+    # # Move focused container to workspace
     bindsym $mod+Shift+1 move container to workspace number 1
     bindsym $mod+Shift+2 move container to workspace number 2
     bindsym $mod+Shift+3 move container to workspace number 3
@@ -166,6 +112,26 @@ exec nm-applet
     bindsym $mod+Shift+0 move container to workspace number 10
     # Note: workspaces can have any name you want, not just numbers.
     # We just use 1-10 as the default.
+
+#
+# Sway mode:
+#
+
+set $mode_system "What to do? (l) lock, (e) logout, (r) reboot, (s) suspend, (Shift+s) shutdown"
+mode $mode_system {
+	bindsym l exec $screenlock; mode "default"
+	bindsym e exec swaymsg exit; mode "default"
+	bindsym r exec systemctl reboot; mode "default"
+	bindsym s exec systemctl suspend; mode "default"
+	bindsym Shift+s exec systemctl poweroff; mode "default"
+
+	# back to normal: Enter or Escape
+	bindsym Return mode "default"
+	bindsym Escape mode "default"
+}
+bindsym $mod+Shift+e mode $mode_system
+
+
 #
 # Layout stuff:
 #
@@ -187,7 +153,7 @@ exec nm-applet
     bindsym $mod+Shift+space floating toggle
 
     # Swap focus between the tiling area and the floating area
-    #bindsym $mod+space focus mode_toggle
+    # bindsym $mod+space focus mode_toggle
 
     # Move focus to the parent container
     bindsym $mod+a focus parent
@@ -228,13 +194,4 @@ mode "resize" {
 }
 bindsym $mod+r mode "resize"
 
-#
-# Status Bar:
-#
-# Read `man 5 sway-bar` for more information about this section.
-bar {
-    swaybar_command waybar
-}
-
-include /etc/sway/config.d/*
-include $HOME/.config/sway/config.d/*
+include ~/.config/sway/config.d/*

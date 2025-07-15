@@ -1,5 +1,5 @@
-#!/usr/bin/env sh
+#!/bin/sh
 
-killall -q waybar
+killall -q waybar 
 while pgrep -x waybar > /dev/null; do sleep 1; done
-waybar&
+~/.local/bin/waybar&

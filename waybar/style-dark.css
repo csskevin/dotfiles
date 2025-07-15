@@ -1,0 +1,82 @@
+@define-color default-fg #9bf7fb;
+@define-color urgent-fg #d4344f;
+@define-color urgent-bg black;
+@define-color focused-fg black;
+@define-color charged-fg #65ee63;
+
+window#waybar * {
+    font-family: 'BerkeleyMono Nerd Font';
+    font-size: 11px;
+    border-radius: 0;
+    min-height: 0;
+    border: none;
+    padding: 0;
+    margin: 0;
+}
+
+
+
+window#waybar {
+    background-color: rgba(40, 40, 40, 0.9);
+    color: @default-fg;
+    transition-property: background-color;
+    transition-duration: .5s;
+    padding-bottom: 5px;
+    padding: 4px;
+}
+
+#workspaces button {
+    color: inherit;
+    font-weight: 200;
+}
+
+/* https://github.com/Alexays/Waybar/wiki/FAQ#the-workspace-buttons-have-a-strange-hover-effect */
+#workspaces button:hover {
+    background: rgba(0, 0, 0, 0.2);
+    box-shadow: inherit;
+    text-shadow: inherit;
+}
+
+#workspaces button.focused {
+    background: @default-fg;
+    color: @focused-fg;
+}
+
+#workspaces button.urgent {
+    background-color: @urgent-bg;
+    color: @urgent-fg;
+    border: 1px solid @urgent-fg;
+}
+
+/* ----- */
+
+#window {
+	margin-left: 5px;
+	font-size: 10px;
+}
+
+/* ----- */
+
+#clock {
+    margin: 1px;
+    color: inherit;
+    font-weight: 200;
+    margin-left: 10px;
+}
+
+/* ----- */
+
+#custom-kernel, #pulseaudio, #network, #cpu, #memory, #battery, #backlight, #kernel {
+    padding-left: 2px;
+    padding-right: 2px;
+    background-color: transparent;
+    color: inherit;
+}
+
+#battery.discharging.critical {
+    color: @urgent-fg;
+}
+
+#battery.charging.full {
+    color: @charged-fg;
+}

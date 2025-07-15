@@ -1,0 +1,114 @@
+{
+    "layer": "top",
+    "position": "top",
+    "height": 18, // Waybar height (to be removed for auto height)
+    "spacing": 4,
+    "output": #OUTPUT,
+    "modules-left": ["sway/workspaces", "sway/window"],
+    "modules-center": ["clock"],
+    #REGULAR "modules-right": ["tray", "pulseaudio", "backlight", "battery", "cpu", "memory", "custom/disk", "custom/kernel"],
+    #COMPACT "modules-right": ["tray", "pulseaudio", "battery", "custom/disk", "sway/language", "custom/kernel"],
+
+    //"output": "eDP-1",
+    "sway/workspaces": {
+      //"persistent-workspaces": {
+      //  "1": [],
+      //  "2": [],
+      //  "3": [],
+      //  "4": [],
+      //  "5": [],
+      //  "6": [],
+      //  "7": [],
+      //  "8": [],
+      //  "9": [],
+      //},
+      "disable-scroll": true,
+      "warp-on-scroll": false,
+      "format": " {name} ",
+      "tooltip": false,
+    },
+    "sway/window": {
+    	"format": "$~ {}",
+    	"max-length": 100,
+      "tooltip": false,
+    },
+    // Clock
+    "clock": {
+        "timezone": "Europe/Vienna",
+        "interval": 1,
+        "format": "{:%H:%M:%S %d-%m-%Y}",
+      "tooltip": false,
+    },
+    // CPU usage
+    "cpu": {
+        "format": "/ CPU: {usage}%",
+        "tooltip": false,
+    },
+    // RAM
+    "memory": {
+        "format": "/ RAM: {}%",
+        "tooltip": false,
+    },
+    // Screen light
+    "backlight": {
+        "format": "/ BRI: {percent}% ",
+        "tooltip": false,
+    },
+    // Battery
+    "battery": {
+        "design-capacity": true,
+        "format": "/ BAT: {capacity}% ",
+        "format-plugged": "/ BAT: +{capacity}% ",
+        "tooltip": false,
+        "states": {
+            "critical": 20,
+            "medium": 85,
+            "full": 100
+        }
+    },
+    // Network
+    "network": {
+        // "interface": "wlp2*", // (Optional) To force the use of this interface
+        "interval": 1,
+        "format-wifi": "WIFI: {essid} {signalStrength}%", // / RX: {bandwidthDownBytes:>} / TX: {bandwidthUpBytes:>}",
+        "format-alt": "WIFI: {ipaddr}", // / RX: {bandwidthDownBytes:>} / TX: {bandwidthUpBytes:>}",
+        "format-ethernet": "ETH: {ipaddr}",
+        "format-disconnected": "WIFI: N/A",
+        "tooltip": false,
+    },
+    // Pulseaudio MIC & VOL
+    "pulseaudio": {
+        "scroll-step": 1,
+        "format": "/ VOL: {volume}% ",
+        // "format": "/ VOL {volume}% / MIC {format_source}",
+	      "format-source": "{volume}",
+        "tooltip": false,
+    },
+    // Kernel Version
+    "custom/kernel": {
+        "format": "/ KERN: {} ",
+        "interval": 43200,
+        "return-type": "text",
+        "max-length": 24,
+        "escape": true,
+        "exec": "uname -r 2>/dev/null | awk -F'.fc' '{print $1}' | cut -d '-' -f 1",
+        "tooltip": false,
+    },
+    // Disk Size
+    "custom/disk": {
+        "format": "/ DISK:{}",
+        "interval": 120,
+        "return-type": "text",
+        "max-length": 17,
+        "escape": true,
+        "exec": "df /dev/dm-0 -H --output=avail | tail -n 1",
+        "tooltip": false,
+    },
+    // Keyboard Layout
+    "sway/language": {
+        "format": "/ KEY: {shortUppercase}",
+        "on-click": "swaymsg input type:keyboard xkb_switch_layout next"
+    }
+}
+
+// vim: set ft=json:

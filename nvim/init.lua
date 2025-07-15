@@ -1,5 +1,11 @@
-
-
+-- Disable yank on delete
+-- vim.keymap.set("n", "d", "\"_d")
+-- vim.keymap.set("v", "d", "\"_d")
+-- vim.keymap.set("n", "x", "\"_x")
+-- vim.keymap.set("v", "x", "\"_x")
+-- vim.keymap.set("n", "D", "\"_D")
+-- vim.keymap.set("v", "D", "\"_D")
+--
 -- disable netrw at the very start of your init.lua
 vim.g.loaded_netrw = 1
 vim.g.loaded_netrwPlugin = 1
@@ -20,6 +26,7 @@ vim.opt.expandtab = true
 vim.opt.tabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.softtabstop = 2
+vim.opt.colorcolumn = "80"
 
 -- Set terminal interface
 vim.go.termguicolors = true
@@ -66,6 +73,7 @@ vim.opt.cursorline = true
 
 vim.opt.hlsearch = true
 
+-- vim.cmd.colorscheme("elflord")
 -------------
 -- Theming --
 -------------
@@ -131,14 +139,17 @@ vim.keymap.set("n", "<leader>w", "<cmd>w<CR>")
 --  Split navigation
 vim.keymap.set("n", "<C-h>", "<C-PageUp>", { desc = "Move focus to the left window" })
 vim.keymap.set("n", "<C-l>", "<C-PageDown>", { desc = "Move focus to the right window" })
--- vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
--- vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
-vim.keymap.set("n", "<C-c>", ":tabnew<CR>", { desc = "New tab" })
+vim.keymap.set("n", "<C-j>", "<C-w><C-j>", { desc = "Move focus to the lower window" })
+vim.keymap.set("n", "<C-k>", "<C-w><C-k>", { desc = "Move focus to the upper window" })
+--
+--
+-- vim.keymap.set("n", "<C-c>", ":tabnew<CR>", { desc = "New tab" })
 vim.keymap.set("n", "<C-j>", ":NvimTreeToggle<CR>", { desc = "Toggles nvim tree" })
 
 vim.keymap.set('n', '<leader>S', '<cmd>lua require("spectre").toggle()<CR>', {
     desc = "Toggle Spectre"
 })
+
 -------------
 -- Plugins --
 -------------
@@ -173,8 +184,22 @@ require("lazy").setup({
     }
   },
   {
-    "jose-elias-alvarez/null-ls.nvim"
+    "folke/tokyonight.nvim",
+    opts = {
+      transparent = true,
+      styles = {
+        sidebars = "transparent",
+        floats = "transparent",
+      },
+    },
   },
+  -- {
+  --   "ajmwagar/vim-deus",
+  --   config = function()
+  --     vim.cmd("colorscheme deus")
+  --   end,
+  --
+  -- },
   {
     "nvim-pack/nvim-spectre"
   },
@@ -186,7 +211,11 @@ require("lazy").setup({
       "nvim-tree/nvim-web-devicons",
     },
     config = function()
-      require("nvim-tree").setup {}
+      require("nvim-tree").setup {
+        view = {
+          side = "right"
+        }
+      }
     end,
   },
   {
@@ -202,7 +231,7 @@ require("lazy").setup({
     neoscroll = require('neoscroll')
     local keymap = {
       ["<C-u>"] = function() neoscroll.ctrl_u({ duration = 10}) end;
-      ["<C-d>"] = function() neoscroll.ctrl_d({ duration = 10 }) end;
+      ["<C-d>"] = function() neoscroll.ctrl_d({ duration = 10}) end;
       ["<C-b>"] = function() neoscroll.ctrl_b({ duration = 50 }) end;
       ["<C-f>"] = function() neoscroll.ctrl_f({ duration = 50 }) end;
       ["<C-y>"] = function() neoscroll.scroll(-0.1, { move_cursor=false; duration = 10 }) end;
@@ -574,11 +603,11 @@ require("lazy").setup({
 				-- tsserver = {},
 				--
 
-        typst_lsp = {
-          settings = {
-            exportPdf = "never"
-          }
-        },
+        -- typst_lsp = {
+        --   settings = {
+        --     exportPdf = "never"
+        --   }
+        -- },
 				lua_ls = {
 					-- cmd = {...},
 					-- filetypes = { ...},
@@ -823,5 +852,6 @@ require("lazy").setup({
 	},
 })
 
+vim.cmd("colorscheme tokyonight-moon")
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
