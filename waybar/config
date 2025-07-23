@@ -107,7 +107,8 @@
     },
     // Keyboard Layout
     "sway/language": {
-        "format": "/ KEY: {shortUppercase}"
+        "format": "/ KEY: {short}",
+        "on-click": "swaymsg input type:keyboard xkb_switch_layout next"
     }
 }
 
@@ -221,7 +222,7 @@
     },
     // Keyboard Layout
     "sway/language": {
-        "format": "/ KEY: {shortUppercase}",
+        "format": "/ KEY: {short}",
         "on-click": "swaymsg input type:keyboard xkb_switch_layout next"
     }
 }
