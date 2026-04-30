@@ -30,7 +30,7 @@ vim.opt.colorcolumn = "80"
 
 -- Set terminal interface
 vim.go.termguicolors = true
-vim.go.background = "dark"
+-- vim.go.background = "dark"
 vim.g.have_nerd_font = false
 
 -- nvim-cmp limits
@@ -150,6 +150,16 @@ vim.keymap.set('n', '<leader>S', '<cmd>lua require("spectre").toggle()<CR>', {
     desc = "Toggle Spectre"
 })
 
+vim.keymap.set("n", "<leader>v", function()
+  if vim.diagnostic.config().virtual_lines then
+    vim.diagnostic.config({ virtual_lines = false })
+  else
+    vim.diagnostic.config({ virtual_lines = true })
+  end
+end, { desc = "Toggles virtual lines" })
+
+vim.keymap.set("n", "<C-S-j>", ":NvimTreeFindFile<CR>", { desc = "Shows current file in nvim tree" })
+
 -------------
 -- Plugins --
 -------------
@@ -186,7 +196,7 @@ require("lazy").setup({
   {
     "folke/tokyonight.nvim",
     opts = {
-      transparent = true,
+      -- transparent = true,
       styles = {
         sidebars = "transparent",
         floats = "transparent",
@@ -200,9 +210,9 @@ require("lazy").setup({
   --   end,
   --
   -- },
-  {
-    "nvim-pack/nvim-spectre"
-  },
+  -- {
+  --   "nvim-pack/nvim-spectre"
+  -- },
   {
     "nvim-tree/nvim-tree.lua",
     version = "*",
@@ -852,6 +862,6 @@ require("lazy").setup({
 	},
 })
 
-vim.cmd("colorscheme tokyonight-moon")
+vim.cmd("colorscheme tokyonight")
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
